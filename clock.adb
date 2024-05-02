@@ -8,7 +8,7 @@ with Ada.Calendar.Formatting; use Ada.Calendar.Formatting;
 
 with Raylib; use Raylib;
 
-package body Clok is
+package body Clock is
 
 -- Private Math ----------------------------------------------------------------
 -- This is so ugly how are you supposed to format big functions in ada
@@ -159,4 +159,4 @@ package body Clok is
         DrawLineEx(center, second_v, 2.0, RED);
     end;
 
-end Clok;
+end Clock;
