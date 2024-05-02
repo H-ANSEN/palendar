@@ -21,6 +21,10 @@ package Raylib is
         zoom: Float;
     end record with Convention => C_Pass_By_Copy;
 
+    RED   : constant Color := (255,   0,   0, 255);
+    WHITE : constant Color := (255, 255, 255, 255);
+    BLACK : constant Color := (  0,   0,   0, 255);
+
     procedure InitWindow(width, height: Integer; title: in char_array) with
         Import => True,
         Convention => C,
@@ -80,5 +84,10 @@ package Raylib is
         Import => True,
         Convention => C,
         External_Name => "DrawLineEx";
+
+    procedure DrawRectangle(posX, posY, width, height: Integer; col: Color) with
+        Import => True,
+        Convention => C,
+        External_Name => "DrawRectangle";
 
 end Raylib;
