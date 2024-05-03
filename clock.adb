@@ -126,15 +126,16 @@ package body Clock is
 -- needed to save some computation. i.e. only update 'minute_v' each minute and 
 -- 'hour_v' each hour.
 
-    procedure DrawClock(now: Time; center: Vector2; radius: Float) is
-        time_zone   : constant Time_Offset     := UTC_Time_Offset;
-        hour_t      : constant Hour_Number     := Hour(now, time_zone);
-        minute_t    : constant Minute_Number   := Minute(now, time_zone);
-        second_t    : constant Second_Number   := Second(now);
+    procedure DrawClock(now: Time; pos: Vector2; radius: Float) is
+        time_zone : Time_Offset   := UTC_Time_Offset;
+        hour_t    : Hour_Number   := Hour(now, time_zone);
+        minute_t  : Minute_Number := Minute(now, time_zone);
+        second_t  : Second_Number := Second(now);
 
-        hour_v   : constant Vector2 := hour_hand_v(hour_t, center, radius - 20.0);
-        minute_v : constant Vector2 := minute_hand_v(minute_t, center, radius);
-        second_v : constant Vector2 := second_hand_v(second_t, center, radius);
+        center   : Vector2 := (pos.x + radius, pos.y + radius);
+        hour_v   : Vector2 := hour_hand_v(hour_t, center, radius - 20.0);
+        minute_v : Vector2 := minute_hand_v(minute_t, center, radius);
+        second_v : Vector2 := second_hand_v(second_t, center, radius);
     begin
         DrawClockFace(center, radius);
         DrawLineEx(center, hour_v, 2.0, BLACK);
@@ -142,16 +143,17 @@ package body Clock is
         DrawLineEx(center, second_v, 2.0, RED);
     end;
 
-    procedure DrawClockSmooth(now: Time; center: Vector2; radius: Float) is
-        time_zone   : constant Time_Offset     := UTC_Time_Offset;
-        hour_t      : constant Hour_Number     := Hour(now, time_zone);
-        minute_t    : constant Minute_Number   := Minute(now, time_zone);
-        second_t    : constant Second_Number   := Second(now);
-        subsec_t    : constant Second_Duration := Sub_Second(now);
+    procedure DrawClockSmooth(now: Time; pos: Vector2; radius: Float) is
+        time_zone : Time_Offset     := UTC_Time_Offset;
+        hour_t    : Hour_Number     := Hour(now, time_zone);
+        minute_t  : Minute_Number   := Minute(now, time_zone);
+        second_t  : Second_Number   := Second(now);
+        subsec_t  : Second_Duration := Sub_Second(now);
 
-        hour_v   : constant Vector2 := hour_hand_v_smooth(hour_t, minute_t, second_t, center, radius - 20.0);
-        minute_v : constant Vector2 := minute_hand_v_smooth(minute_t, second_t, center, radius);
-        second_v : constant Vector2 := second_hand_v_smooth(second_t, subsec_t, center, radius);
+        center   : constant Vector2 := (pos.x + radius, pos.y + radius);
+        hour_v   : Vector2 := hour_hand_v_smooth(hour_t, minute_t, second_t, center, radius - 20.0);
+        minute_v : Vector2 := minute_hand_v_smooth(minute_t, second_t, center, radius);
+        second_v : Vector2 := second_hand_v_smooth(second_t, subsec_t, center, radius);
     begin
         DrawClockFace(center, radius);
         DrawLineEx(center, hour_v, 2.0, BLACK);
