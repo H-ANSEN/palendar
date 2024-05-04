@@ -118,8 +118,9 @@ package body Cal is
         cell   : Rectangle;
     begin
         for i in start_day..(days_in_month(year, month) + start_day - 1) loop
-            cell_x := pos.x + Float(cell_height * (i mod 7));
-            cell_y := pos.y + Float(cell_height + cell_width * (i / 7));
+
+            cell_x := pos.x + Float(cell_width * (i mod 7));
+            cell_y := pos.y + Float(cell_height * (i / 7)) + Float(cell_height);
             cell   := (cell_x, cell_y, Float(cell_width), Float(cell_height));
 
             DrawCenteredText(Integer'Image(i - start_day + 1), fnt_size, fnt, BLACK, cell);
@@ -158,7 +159,7 @@ package body Cal is
         cell_x : Float;
         cell_y : Float;
     begin
-        cell_x := pos.x + Float(cell_height * ((day + start_day - 1) mod 7));
+        cell_x := pos.x + Float(cell_width * ((day + start_day - 1) mod 7));
         cell_y := pos.y + Float(cell_height + cell_width * ((day + start_day - 1) / 7));
         DrawRectangleRec((cell_x, cell_y, Float(cell_width), Float(cell_height)), (0,255,0, 150));
     end;
