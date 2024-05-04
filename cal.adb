@@ -1,6 +1,7 @@
 with Ada.Calendar; use Ada.Calendar;
 with Ada.Calendar.Formatting; use Ada.Calendar.Formatting; 
 
+with Ada.Text_IO;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
@@ -85,15 +86,16 @@ package body Cal is
         DrawTextEx(fnt, To_C(Trim(text, Both)), text_draw_pos, size, 1.0, col);
     end;
 
-    procedure DrawCalendarBackground(pos: Vector2) is
+    procedure DrawCalendarBackground(pos: Vector2; rows: Integer) is
         cell_w : Float := Float(cell_width);
         cell_h : Float := Float(cell_height);
     begin
         DrawRectangleRec((pos.x, pos.y, cell_w, cell_h), RED);
         DrawRectangleRec((pos.x + cell_w, pos.y, cell_w * 5.0, cell_h), GRAY);
         DrawRectangleRec((pos.x + cell_w * 6.0, pos.y, cell_w, cell_h), BLUE);
-        DrawRectangleRec((pos.x, pos.y + cell_h, cell_w, cell_h * 5.0), PINK);
-        DrawRectangleRec((pos.x + cell_w * 6.0, pos.y + cell_h, cell_w, cell_h * 5.0), LIGHTBLUE);
+
+        DrawRectangleRec((pos.x, pos.y + cell_h, cell_w, cell_h * Float(rows)), PINK);
+        DrawRectangleRec((pos.x + cell_w * 6.0, pos.y + cell_h, cell_w, cell_h * Float(rows)), LIGHTBLUE);
     end;
 
     procedure DrawCalendarHeader(pos: Vector2; fnt: Font) is
@@ -124,16 +126,15 @@ package body Cal is
         end loop;
     end;
 
-    procedure DrawCalendarGrid(pos: Vector2) is
+    procedure DrawCalendarGrid(pos: Vector2; rows: Integer) is
         cell_w : Float := Float(cell_width);
         cell_h : Float := Float(cell_height);
         calendar_w : Float := cell_w * 7.0;
-        calendar_h : Float := cell_h * 6.0;
+        calendar_h : Float := cell_h * (Float(rows) + 1.0);
     begin
-        DrawLineEx((pos.x, pos.y + cell_h * 2.0), (pos.x + calendar_w, pos.y + cell_h * 2.0), 2.0, LIGHTGREY);
-        DrawLineEx((pos.x, pos.y + cell_h * 3.0), (pos.x + calendar_w, pos.y + cell_h * 3.0), 2.0, LIGHTGREY);
-        DrawLineEx((pos.x, pos.y + cell_h * 4.0), (pos.x + calendar_w, pos.y + cell_h * 4.0), 2.0, LIGHTGREY);
-        DrawLineEx((pos.x, pos.y + cell_h * 5.0), (pos.x + calendar_w, pos.y + cell_h * 5.0), 2.0, LIGHTGREY);
+        for i in 2..rows loop
+            DrawLineEx((pos.x, pos.y + cell_h * Float(i)), (pos.x + calendar_w, pos.y + cell_h * Float(i)), 2.0, LIGHTGREY); 
+        end loop;
 
         DrawLineEx((pos.x + cell_w, pos.y + cell_h), (pos.x + cell_w, pos.y + calendar_h), 2.0, LIGHTGREY);
         DrawLineEx((pos.x + cell_w * 2.0, pos.y + cell_h), (pos.x + cell_w * 2.0, pos.y + calendar_h), 2.0, LIGHTGREY);
@@ -169,18 +170,22 @@ package body Cal is
         month : Month_Number := Integer(Ada.Calendar.Month(now));
         day   : Day_Number   := Integer(Ada.Calendar.Day(now));
 
-        month_start : Integer;
+        month_start  : Integer; -- 0..6 day of the week the month starts on
+        cells_needed : Integer; -- cells in the calendar needed to draw all days
+        rows_needed  : Integer; -- rows needed to fit cells in columns of '7'
 
         calendar_w : Integer := cell_width * 7;
         calendar_h : Integer := cell_height * 6;
     begin
-        month_start := Integer(week_num_of(year, month, 1));
+        month_start  := Integer(week_num_of(year, month, 1));
+        cells_needed := month_start + days_in_month(year, month);
+        rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
 
-        DrawCalendarBackground(pos);
+        DrawCalendarBackground(pos, rows_needed);
         DrawCalendarHeader(pos, fnt);
         DrawCalendarNumbers(pos, fnt, year, month, month_start);
         DrawDayHighlight(pos, day, month_start);
-        DrawCalendarGrid(pos);
+        DrawCalendarGrid(pos, rows_needed);
     end;
 
 end Cal;
