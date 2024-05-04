@@ -121,8 +121,45 @@ package body Cal is
             cell   := (cell_x, cell_y, Float(cell_width), Float(cell_height));
 
             DrawCenteredText(Integer'Image(i - start_day + 1), fnt_size, fnt, BLACK, cell);
-            DrawRectangleRec(cell, (0,0,0,100));
         end loop;
+    end;
+
+    procedure DrawCalendarGrid(pos: Vector2) is
+        cell_w : Float := Float(cell_width);
+        cell_h : Float := Float(cell_height);
+        calendar_w : Float := cell_w * 7.0;
+        calendar_h : Float := cell_h * 6.0;
+    begin
+        DrawLineEx((pos.x, pos.y + cell_h * 2.0), (pos.x + calendar_w, pos.y + cell_h * 2.0), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x, pos.y + cell_h * 3.0), (pos.x + calendar_w, pos.y + cell_h * 3.0), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x, pos.y + cell_h * 4.0), (pos.x + calendar_w, pos.y + cell_h * 4.0), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x, pos.y + cell_h * 5.0), (pos.x + calendar_w, pos.y + cell_h * 5.0), 2.0, LIGHTGREY);
+
+        DrawLineEx((pos.x + cell_w, pos.y + cell_h), (pos.x + cell_w, pos.y + calendar_h), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x + cell_w * 2.0, pos.y + cell_h), (pos.x + cell_w * 2.0, pos.y + calendar_h), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x + cell_w * 3.0, pos.y + cell_h), (pos.x + cell_w * 3.0, pos.y + calendar_h), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x + cell_w * 4.0, pos.y + cell_h), (pos.x + cell_w * 4.0, pos.y + calendar_h), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x + cell_w * 5.0, pos.y + cell_h), (pos.x + cell_w * 5.0, pos.y + calendar_h), 2.0, LIGHTGREY);
+        DrawLineEx((pos.x + cell_w * 6.0, pos.y + cell_h), (pos.x + cell_w * 6.0, pos.y + calendar_h), 2.0, LIGHTGREY);
+
+        DrawLineEx((pos.x, pos.y + cell_h), (pos.x + calendar_w, pos.y + cell_h), 2.0, BLACK);
+        DrawLineEx((pos.x + cell_w, pos.y), (pos.x + cell_w, pos.y + cell_h), 2.0, BLACK);
+        DrawLineEx((pos.x + cell_w * 2.0, pos.y), (pos.x + cell_w * 2.0, pos.y + cell_h), 2.0, BLACK);
+        DrawLineEx((pos.x + cell_w * 3.0, pos.y), (pos.x + cell_w * 3.0, pos.y + cell_h), 2.0, BLACK);
+        DrawLineEx((pos.x + cell_w * 4.0, pos.y), (pos.x + cell_w * 4.0, pos.y + cell_h), 2.0, BLACK);
+        DrawLineEx((pos.x + cell_w * 5.0, pos.y), (pos.x + cell_w * 5.0, pos.y + cell_h), 2.0, BLACK);
+        DrawLineEx((pos.x + cell_w * 6.0, pos.y), (pos.x + cell_w * 6.0, pos.y + cell_h), 2.0, BLACK);
+
+        DrawRectangleLinesEx((pos.x, pos.y, Float(calendar_w), Float(calendar_h)), 2.0, BLACK);
+    end;
+
+    procedure DrawDayHighlight(pos: Vector2; day, start_day: Integer) is
+        cell_x : Float;
+        cell_y : Float;
+    begin
+        cell_x := pos.x + Float(cell_height * ((day + start_day - 1) mod 7));
+        cell_y := pos.y + Float(cell_height + cell_width * ((day + start_day - 1) / 7));
+        DrawRectangleRec((cell_x, cell_y, Float(cell_width), Float(cell_height)), (0,255,0, 150));
     end;
 
 -- Public ----------------------------------------------------------------------
@@ -134,17 +171,16 @@ package body Cal is
 
         month_start : Integer;
 
-        calendar_width  : Integer := cell_width * 7;
-        calendar_height : Integer := cell_height * 6;
+        calendar_w : Integer := cell_width * 7;
+        calendar_h : Integer := cell_height * 6;
     begin
         month_start := Integer(week_num_of(year, month, 1));
 
         DrawCalendarBackground(pos);
         DrawCalendarHeader(pos, fnt);
         DrawCalendarNumbers(pos, fnt, year, month, month_start);
-        --DrawCalendarGrid(pos);
-
-        DrawRectangleLines(Integer(pos.x), Integer(pos.y), calendar_width, calendar_height, BLACK);
+        DrawDayHighlight(pos, day, month_start);
+        DrawCalendarGrid(pos);
     end;
 
 end Cal;
