@@ -6,7 +6,7 @@ with Raylib; use Raylib;
 with Clock; use Clock;
 with Cal; use Cal;
 
-procedure Tide is
+procedure Palendar is
     screen_w : constant Integer := 600;
     screen_h : constant Integer := 400;
     screen_center_v : constant Vector2 := (Float(screen_w / 2), Float(screen_h / 2));
@@ -31,4 +31,4 @@ begin
 
     CalendarDestory(cal);
     CloseWindow;
-end Tide;
+end Palendar;
