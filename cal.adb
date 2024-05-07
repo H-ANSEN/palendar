@@ -6,41 +6,121 @@ with Raylib; use Raylib;
 
 package body Cal is
 
+-- Private Forward Decl --------------------------------------------------------
+
+function is_leap_year(year: Year_Number) return Boolean;
+function week_num_of(year, month, day: Integer) return Week_Number;
+function day_name_of(num: Week_Number) return Day_Name;
+
+procedure DrawCalendarBackground(pos: Vector2; rows: Integer);
+procedure DrawCalendarHeader(pos: Vector2; fnt: Font);
+procedure DrawCalendarNumbers(pos: Vector2; fnt: Font; year, month, start_day: Integer);
+procedure DrawCalendarGrid(pos: Vector2; rows: Integer);
+procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Color);
+
+-- Public ----------------------------------------------------------------------
+
+    function CalendarMake(pos: Vector2) return Calendar_T is
+        cal_fnt : Font := LoadFont("Retron2000.ttf");
+    begin 
+        SetTextureFilter(cal_fnt.texture, TEXTURE_FILTER_BILINEAR);
+        return (
+            pos => pos,
+            fnt => cal_fnt,
+            tex => LoadRenderTexture(231, 200),
+            others => <>
+        );
+    end;
+
+    procedure CalendarDestory(cal: Calendar_T) is
+    begin
+        UnloadRenderTexture(cal.tex);
+        UnloadFont(cal.fnt);
+    end;
+    
+    procedure Draw(self: in out Calendar_T) is
+        year  : Year_Number;
+        month : Month_Number;
+        day   : Day_Number;  
+
+        cells_needed : Integer;
+        rows_needed  : Integer;
+
+        bounds : constant Rectangle := (
+            x => 0.0, y => 0.0,
+            width => Float(self.tex.texture.width),
+            height => Float(-self.tex.texture.height)
+        );
+    begin
+        if self.dirty then
+            year  := AC.Year(self.now);
+            month := AC.Month(self.now);
+            day   := AC.Day(self.now);
+
+            cells_needed := self.start_day + days_in_month(year, month);
+            rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
+
+            BeginTextureMode(self.tex);
+                ClearBackground(WHITE);
+                DrawCalendarBackground((0.0, 0.0), rows_needed);
+                DrawCalendarHeader((0.0, 0.0), self.fnt);
+                DrawCalendarNumbers((0.0, 0.0), self.fnt, year, month, self.start_day);
+                DrawDayHighlight((0.0, 0.0), self, day, (0, 255, 0, 150));
+                DrawCalendarGrid((0.0, 0.0), rows_needed);
+            EndTextureMode;
+
+            self.dirty := False;
+        end if;
+
+        DrawTextureRec(self.tex.texture, bounds, self.pos, WHITE);
+
+        if CalendarCellClicked(self) > 0 and CalendarCellClicked(self) <= self.month_days then
+            DrawDayHighlight(self.pos, self, CalendarCellClicked(self), (0, 0, 38, 140));
+        end if;
+    end;
+
+    function CalendarCellClicked(self: Calendar_T) return Integer is
+        cal_w      : Float     := Float(cell_width * 7);
+        cal_h      : Float     := Float(cell_height * 6);
+        cal_bounds : Rectangle := (self.pos.x, self.pos.y + Float(cell_height), cal_w, cal_h);
+        mousePos   : Vector2   := GetMousePosition;
+
+        cell_x : Integer;
+        cell_y : Integer;
+    begin
+        if CheckCollisionPointRec(mousePos, cal_bounds) then
+            cell_y := Integer(mousePos.y - (self.pos.y + Float(cell_height))) / cell_height;
+            cell_x := Integer(mousePos.x - self.pos.x) / cell_width;
+
+            return cell_y * 7 + cell_x - self.start_day + 1;
+        end if;
+
+        return 0;
+    end;
+
 -- Private Helper --------------------------------------------------------------
 
     function is_leap_year(year: Year_Number) return Boolean is
     begin
         return ((year mod 4)   = 0 and 
                 (year mod 100) = 0 and
-                (year mod 400) = 0
-        );
+                (year mod 400) = 0);
     end;
 
     function days_in_month(year: Year_Number; month: Month_Number) return Integer is
     begin
-        return (
-            case month is
-                when 1  => 31,
-                when 2  => (if is_leap_year(year) then 29 else 28),
-                when 3  => 31,
-                when 4  => 30,
-                when 5  => 31,
-                when 6  => 30,
-                when 7  => 31,
-                when 8  => 31,
-                when 9  => 30,
-                when 10 => 31,
-                when 11 => 30,
-                when 12 => 31
-        );
+        return (case month is
+                when 1  => 31, when 2  => (if is_leap_year(year) then 29 else 28),
+                when 3  => 31, when 4  => 30, when 5  => 31, when 6  => 30,
+                when 7  => 31, when 8  => 31, when 9  => 30, when 10 => 31,
+                when 11 => 30, when 12 => 31);
     end;
 
-    function week_num_of(year : Year_Number; month : Month_Number; 
-                         day  : Day_Number) return Week_Number 
+    function week_num_of(year, month, day: Integer) return Week_Number 
     is
-        y : Integer := Integer(year);
-        m : Integer := Integer(month);
-        d : Integer := Integer(day);
+        y : Integer := year;
+        m : Integer := month;
+        d : Integer := day;
         c : Integer;
     begin
         if m < 3 then
@@ -57,16 +137,10 @@ package body Cal is
 
     function day_name_of(num: Week_Number) return Day_Name is
     begin
-        return (
-            case num is
-                when 0 => Sunday,
-                when 1 => Monday,
-                when 2 => Tuesday,
-                when 3 => Wednesday,
-                when 4 => Thursday,
-                when 5 => Friday,
-                when 6 => Saturday
-        );
+        return (case num is
+                when 0 => Sunday, when 1 => Monday, when 2 => Tuesday, 
+                when 3 => Wednesday, when 4 => Thursday, when 5 => Friday,
+                when 6 => Saturday);
     end;
 
     function month_start(ntime : Time) return Integer is
@@ -83,7 +157,6 @@ package body Cal is
         DrawRectangleRec((pos.x, pos.y, cell_w, cell_h), RED);
         DrawRectangleRec((pos.x + cell_w, pos.y, cell_w * 5.0, cell_h), GRAY);
         DrawRectangleRec((pos.x + cell_w * 6.0, pos.y, cell_w, cell_h), BLUE);
-
         DrawRectangleRec((pos.x, pos.y + cell_h, cell_w, cell_h * Float(rows)), PINK);
         DrawRectangleRec((pos.x + cell_w * 6.0, pos.y + cell_h, cell_w, cell_h * Float(rows)), LIGHTBLUE);
     end;
@@ -94,9 +167,9 @@ package body Cal is
         cell          : Rectangle;
     begin
         for i in Week_Number'Range loop
-            day_text      := day_name_of(i)'Image(1..2);
-            cell_x        := Integer(pos.x) + Integer(i) * cell_width;
-            cell := (Float(cell_x), pos.y, Float(cell_width), Float(cell_height));
+            day_text := day_name_of(i)'Image(1..2);
+            cell_x   := Integer(pos.x) + Integer(i) * cell_width;
+            cell     := (Float(cell_x), pos.y, Float(cell_width), Float(cell_height));
 
             DrawCenteredText(day_text, fnt_size, fnt, WHITE, cell);
         end loop;
@@ -108,7 +181,6 @@ package body Cal is
         cell   : Rectangle;
     begin
         for i in start_day..(days_in_month(year, month) + start_day - 1) loop
-
             cell_x := pos.x + Float(cell_width * (i mod 7));
             cell_y := pos.y + Float(cell_height * (i / 7)) + Float(cell_height);
             cell   := (cell_x, cell_y, Float(cell_width), Float(cell_height));
@@ -145,90 +217,13 @@ package body Cal is
         DrawRectangleLinesEx((pos.x, pos.y, Float(calendar_w), Float(calendar_h)), 2.0, BLACK);
     end;
 
-    procedure DrawDayHighlight(pos: Vector2; day, start_day: Integer) is
+    procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Color) is
         cell_x : Float;
         cell_y : Float;
     begin
-        cell_x := pos.x + Float(cell_width * ((day + start_day - 1) mod 7));
-        cell_y := pos.y + Float(cell_height * ((day + start_day) / 7)) + Float(cell_height);
-        DrawRectangleRec((cell_x, cell_y, Float(cell_width), Float(cell_height)), (0,255,0, 150));
-    end;
-
--- Public ----------------------------------------------------------------------
-
-    function CalendarMake(pos: Vector2) return Calendar_T is
-        cal_fnt : Font := LoadFont("Retron2000.ttf");
-    begin 
-        SetTextureFilter(cal_fnt.texture, TEXTURE_FILTER_BILINEAR);
-        return (
-            pos => pos,
-            fnt => cal_fnt,
-            tex => LoadRenderTexture(231, 200),
-            others => <>
-        );
-    end;
-
-    procedure CalendarDestory(cal: Calendar_T) is
-    begin
-        UnloadRenderTexture(cal.tex);
-        UnloadFont(cal.fnt);
-    end;
-    
-    procedure Draw(self: in out Calendar_T) is
-        year  : Year_Number;
-        month : Month_Number;
-        day   : Day_Number;  
-
-        cells_needed : Integer;
-        rows_needed  : Integer;
-    begin
-        if self.dirty then
-            year  := AC.Year(self.now);
-            month := AC.Month(self.now);
-            day   := AC.Day(self.now);
-
-            cells_needed := self.start_day + days_in_month(year, month);
-            rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
-
-            BeginTextureMode(self.tex);
-                ClearBackground(WHITE);
-
-                -- Drawing occurs realitive to the top left of texture
-                DrawCalendarBackground((0.0, 0.0), rows_needed);
-                DrawCalendarHeader((0.0, 0.0), self.fnt);
-                DrawDayHighlight((0.0, 0.0), day, self.start_day);
-                DrawCalendarNumbers((0.0, 0.0), self.fnt, year, month, self.start_day);
-                DrawCalendarGrid((0.0, 0.0), rows_needed);
-            EndTextureMode;
-
-            self.dirty := False;
-        end if;
-
-        DrawTextureRec(self.tex.texture, 
-                       (0.0, 0.0, Float(self.tex.texture.width), Float(-self.tex.texture.height)), 
-                       self.pos, 
-                       WHITE);
-    end;
-
-    function CalendarCellClicked(self: Calendar_T) return Integer is
-        cal_w      : Float     := Float(cell_width * 7);
-        cal_h      : Float     := Float(cell_height * 6);
-        cal_bounds : Rectangle := (self.pos.x, self.pos.y + Float(cell_height), cal_w, cal_h);
-        mousePos   : Vector2   := GetMousePosition;
-
-        cell_x : Integer;
-        cell_y : Integer;
-    begin
-        if CheckCollisionPointRec(mousePos, cal_bounds) and
-           IsMouseButtonPressed(MOUSE_BUTTON_LEFT) then
-
-            cell_y := Integer(mousePos.y - (self.pos.y + Float(cell_height))) / cell_height;
-            cell_x := Integer(mousePos.x - self.pos.x) / cell_width;
-
-            return cell_y * 7 + cell_x - self.start_day + 1;
-        end if;
-
-        return 0;
+        cell_x := pos.x + Float(cell_width * ((day + cal.start_day - 1) mod 7));
+        cell_y := pos.y + Float(cell_height * ((day + cal.start_day - 1) / 7)) + Float(cell_height);
+        DrawRectangleRec((cell_x + 1.0, cell_y + 1.0, Float(cell_width - 1), Float(cell_height - 1)), col);
     end;
 
 end Cal;
