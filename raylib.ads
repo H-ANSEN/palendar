@@ -71,6 +71,26 @@ package Raylib is
     for KeyboardKey use (
         KEY_RIGHT => 262,
         KEY_LEFT  => 263
+    ); 
+        
+    type MouseButton is ( 
+        MOUSE_BUTTON_LEFT,
+        MOUSE_BUTTON_RIGHT,
+        MOUSE_BUTTON_MIDDLE,
+        MOUSE_BUTTON_SIDE,
+        MOUSE_BUTTON_EXTRA,
+        MOUSE_BUTTON_FORWARD,
+        MOUSE_BUTTON_BACK
+    );
+    
+    for MouseButton use ( 
+        MOUSE_BUTTON_LEFT    => 0,
+        MOUSE_BUTTON_RIGHT   => 1,
+        MOUSE_BUTTON_MIDDLE  => 2,
+        MOUSE_BUTTON_SIDE    => 3,
+        MOUSE_BUTTON_EXTRA   => 4,
+        MOUSE_BUTTON_FORWARD => 5,
+        MOUSE_BUTTON_BACK    => 6 
     );
 
     type TextureFilter is (
@@ -216,6 +236,16 @@ package Raylib is
         Import => True,
         Convention => C,
         External_Name => "SetTextureFilter";
+
+    function CheckCollisionPointRec(point: Vector2; rec: Rectangle) return C_Bool with
+        Import => True,
+        Convention => C,
+        External_Name => "CheckCollisionPointRec";
+
+    function IsMouseButtonPressed(btn: MouseButton) return C_Bool with
+        Import => True,
+        Convention => C,
+        External_Name => "IsMouseButtonPressed";
 
     function GetMousePosition return Vector2 with
         Import => True,

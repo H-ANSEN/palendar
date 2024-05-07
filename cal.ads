@@ -6,6 +6,7 @@ with Raylib; use Raylib;
 package Cal is
 
     procedure DrawCalendar(now : Time; pos: Vector2; fnt: Font);
+    function CalendarCellClicked(now: Time; pos: Vector2) return Integer;
 
 private
 

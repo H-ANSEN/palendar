@@ -160,13 +160,13 @@ package body Cal is
         cell_y : Float;
     begin
         cell_x := pos.x + Float(cell_width * ((day + start_day - 1) mod 7));
-        cell_y := pos.y + Float(cell_height + cell_width * ((day + start_day - 1) / 7));
+        cell_y := pos.y + Float(cell_height * ((day + start_day) / 7)) + Float(cell_height);
         DrawRectangleRec((cell_x, cell_y, Float(cell_width), Float(cell_height)), (0,255,0, 150));
     end;
 
 -- Public ----------------------------------------------------------------------
 
-    procedure DrawCalendar(now : Time; pos : Vector2; fnt: Font) is
+    procedure DrawCalendar(now: Time; pos: Vector2; fnt: Font) is
         year  : Year_Number  := Integer(Ada.Calendar.Year(now));
         month : Month_Number := Integer(Ada.Calendar.Month(now));
         day   : Day_Number   := Integer(Ada.Calendar.Day(now));
@@ -174,9 +174,6 @@ package body Cal is
         month_start  : Integer; -- 0..6 day of the week the month starts on
         cells_needed : Integer; -- cells in the calendar needed to draw all days
         rows_needed  : Integer; -- rows needed to fit cells in columns of '7'
-
-        calendar_w : Integer := cell_width * 7;
-        calendar_h : Integer := cell_height * 6;
     begin
         month_start  := Integer(week_num_of(year, month, 1));
         cells_needed := month_start + days_in_month(year, month);
@@ -187,6 +184,34 @@ package body Cal is
         DrawCalendarNumbers(pos, fnt, year, month, month_start);
         DrawDayHighlight(pos, day, month_start);
         DrawCalendarGrid(pos, rows_needed);
+    end;
+
+    function CalendarCellClicked(now: Time; pos: Vector2) return Integer is
+        cal_w : Float := Float(cell_width * 7);
+        cal_h : Float := Float(cell_height * 6);
+        cal_bounds : Rectangle := (pos.x, pos.y + Float(cell_height), cal_w, cal_h);
+
+        year  : Year_Number  := Integer(Ada.Calendar.Year(now));
+        month : Month_Number := Integer(Ada.Calendar.Month(now));
+        month_start : Integer;
+
+        mousePos : Vector2 := GetMousePosition;
+
+        cell_x : Integer;
+        cell_y : Integer;
+    begin
+        if CheckCollisionPointRec(mousePos, cal_bounds) and
+           IsMouseButtonPressed(MOUSE_BUTTON_LEFT) then
+
+            cell_y := Integer(mousePos.y - (pos.y + Float(cell_height))) / cell_height;
+            cell_x := Integer(mousePos.x - pos.x) / cell_width;
+            month_start  := Integer(week_num_of(year, month, 1));
+
+
+            return cell_y * 7 + cell_x - month_start + 1;
+        end if;
+
+        return 0;
     end;
 
 end Cal;
