@@ -160,34 +160,43 @@ package body Cal is
         cell_y : Float;
     begin
         cell_x := pos.x + Float(cell_width * ((day + start_day - 1) mod 7));
-        cell_y := pos.y + Float(cell_height + cell_width * ((day + start_day - 1) / 7));
+        cell_y := pos.y + Float(cell_height * ((day + start_day) / 7)) + Float(cell_height);
         DrawRectangleRec((cell_x, cell_y, Float(cell_width), Float(cell_height)), (0,255,0, 150));
     end;
 
 -- Public ----------------------------------------------------------------------
 
-    procedure DrawCalendar(now : Time; pos : Vector2; fnt: Font) is
-        year  : Year_Number  := Integer(Ada.Calendar.Year(now));
-        month : Month_Number := Integer(Ada.Calendar.Month(now));
-        day   : Day_Number   := Integer(Ada.Calendar.Day(now));
+    procedure Draw(self: in out Calendar_T) is
+        year  : Year_Number  := Integer(Ada.Calendar.Year(self.ntime));
+        month : Month_Number := Integer(Ada.Calendar.Month(self.ntime));
+        day   : Day_Number   := Integer(Ada.Calendar.Day(self.ntime));
+
+        pos : Vector2 := (self.x, self.y);
 
         month_start  : Integer; -- 0..6 day of the week the month starts on
         cells_needed : Integer; -- cells in the calendar needed to draw all days
         rows_needed  : Integer; -- rows needed to fit cells in columns of '7'
 
-        calendar_w : Integer := cell_width * 7;
-        calendar_h : Integer := cell_height * 6;
+        calendar_w : Integer;
+        calendar_h : Integer;
     begin
+        cell_width  := Integer(self.width / 7.0);
+        cell_height := Integer(self.height / 7.0);
+        calendar_w  := cell_width * 7;
+        calendar_h  := cell_height * 6;
+
         month_start  := Integer(week_num_of(year, month, 1));
         cells_needed := month_start + days_in_month(year, month);
         rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
 
         DrawCalendarBackground(pos, rows_needed);
-        DrawCalendarHeader(pos, fnt);
-        DrawCalendarNumbers(pos, fnt, year, month, month_start);
+        DrawCalendarHeader(pos, self.fnt);
+        DrawCalendarNumbers(pos, self.fnt, year, month, month_start);
         DrawDayHighlight(pos, day, month_start);
         DrawCalendarGrid(pos, rows_needed);
     end;
+
+    procedure Update(self: in out Calendar_T) is begin null; end;
 
 end Cal;
 

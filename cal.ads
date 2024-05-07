@@ -2,10 +2,19 @@ with Ada.Calendar; use Ada.Calendar;
 with Ada.Calendar.Formatting; use Ada.Calendar.Formatting;
 
 with Raylib; use Raylib;
+with RGUI.Component; use RGUI.Component;
 
 package Cal is
 
-    procedure DrawCalendar(now : Time; pos: Vector2; fnt: Font);
+    type Calendar_T is new Component_T with record
+        fnt   : Font := GetFontDefault;
+        ntime : Time := Ada.Calendar.Clock;
+    end record;
+
+    overriding procedure Draw(self: in out Calendar_T);
+    overriding procedure Update(self: in out Calendar_T);
+
+    --procedure DrawCalendar(now : Time; pos: Vector2; fnt: Font);
 
 private
 
