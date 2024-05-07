@@ -12,7 +12,7 @@ package RGUI.Component is
         bg_color      : Color;
     end record;
 
-    procedure Draw(self: Component_T) is abstract;
+    procedure Draw(self: in out Component_T) is abstract;
     procedure Update(self: in out Component_T) is abstract;
 
 -- Provided Def ----------------------------------------------------------------

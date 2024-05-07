@@ -11,7 +11,6 @@ with Raylib; use Raylib;
 package body Clock is
 
 -- Private Math ----------------------------------------------------------------
--- This is so ugly how are you supposed to format big functions in ada
 
     function degree_to_radian(degree: Float) return Float is
     begin
@@ -56,53 +55,6 @@ package body Clock is
                 hour_v.y + center.y);
     end;
 
-    function second_hand_v_smooth(second  : Second_Number;
-                                  sub_sec : Second_Duration;
-                                  center  : Vector2;
-                                  radius  : Float) return Vector2 is
-
-        second_angle   : constant Float := Float(second * 6);
-        sub_sec_offset : constant Float := Float(sub_sec) * 6.0;
-
-        second_rad : constant Float   := degree_to_radian(second_angle + sub_sec_offset - 90.0);
-        second_v   : constant Vector2 := polar_to_cartesian(radius, second_rad);
-    begin
-        return (second_v.x + center.x, 
-                second_v.y + center.y);
-    end;
-
-    function minute_hand_v_smooth(minute : Minute_Number; 
-                                  second : Second_Number; 
-                                  center : Vector2;
-                                  radius : Float) return Vector2 is
-
-        minute_angle  : constant Float := Float(minute * 6);
-        second_offset : constant Float := Float(second) * 0.1;
-
-        minute_rad : constant Float   := degree_to_radian(minute_angle + second_offset - 90.0);
-        minute_v   : constant Vector2 := polar_to_cartesian(radius, minute_rad);
-    begin
-        return (minute_v.x + center.x,
-                minute_v.y + center.y);
-    end;
-
-    function hour_hand_v_smooth(hour   : Hour_Number;
-                                minute : Minute_Number;
-                                second : Second_Number;
-                                center : Vector2;
-                                radius : Float) return Vector2 is
-
-        hour_angle    : constant Float := Float((hour mod 12) * 30);
-        minute_offset : constant Float := Float(minute) * 0.5;
-        second_offset : constant Float := Float(second) * (1.0 / 120.0);
-
-        hour_rad : constant Float   := degree_to_radian(hour_angle + minute_offset + second_offset - 90.0);
-        hour_v   : constant Vector2 := polar_to_cartesian(radius, hour_rad);
-    begin
-        return (hour_v.x + center.x,
-                hour_v.y + center.y);
-    end;
-
 -- Private Drawing -------------------------------------------------------------
 
     -- TODO: This is placeholder clock face should implement something a bit 
@@ -122,43 +74,28 @@ package body Clock is
     end;
 
 -- Public ----------------------------------------------------------------------
--- TODO: For 'DrawClock' store vector coords at package level and only update as
--- needed to save some computation. i.e. only update 'minute_v' each minute and 
--- 'hour_v' each hour.
 
-    procedure DrawClock(now: Time; pos: Vector2; radius: Float) is
+    overriding procedure Draw(self: in out Clock_T) is
         time_zone : Time_Offset   := UTC_Time_Offset;
-        hour_t    : Hour_Number   := Hour(now, time_zone);
-        minute_t  : Minute_Number := Minute(now, time_zone);
-        second_t  : Second_Number := Second(now);
+        hour_t    : Hour_Number   := Hour(self.ntime, time_zone);
+        minute_t  : Minute_Number := Minute(self.ntime, time_zone);
+        second_t  : Second_Number := Second(self.ntime);
 
-        center   : Vector2 := (pos.x + radius, pos.y + radius);
-        hour_v   : Vector2 := hour_hand_v(hour_t, center, radius - 20.0);
+        radius   : Float   := Float'Min(self.width, self.height) / 2.0;
+        center   : Vector2 := (self.x + radius, self.y + radius);
+        hour_v   : Vector2 := hour_hand_v(hour_t, center, radius * 0.8);
         minute_v : Vector2 := minute_hand_v(minute_t, center, radius);
         second_v : Vector2 := second_hand_v(second_t, center, radius);
     begin
         DrawClockFace(center, radius);
-        DrawLineEx(center, hour_v, 2.0, BLACK);
-        DrawLineEx(center, minute_v, 2.0, BLACK);
-        DrawLineEx(center, second_v, 2.0, RED);
+        DrawLineEx(center, hour_v, 3.0, BLACK);
+        DrawLineEx(center, minute_v, 3.0, BLACK);
+        DrawLineEx(center, second_v, 3.0, RED);
     end;
 
-    procedure DrawClockSmooth(now: Time; pos: Vector2; radius: Float) is
-        time_zone : Time_Offset     := UTC_Time_Offset;
-        hour_t    : Hour_Number     := Hour(now, time_zone);
-        minute_t  : Minute_Number   := Minute(now, time_zone);
-        second_t  : Second_Number   := Second(now);
-        subsec_t  : Second_Duration := Sub_Second(now);
-
-        center   : constant Vector2 := (pos.x + radius, pos.y + radius);
-        hour_v   : Vector2 := hour_hand_v_smooth(hour_t, minute_t, second_t, center, radius - 20.0);
-        minute_v : Vector2 := minute_hand_v_smooth(minute_t, second_t, center, radius);
-        second_v : Vector2 := second_hand_v_smooth(second_t, subsec_t, center, radius);
+    overriding procedure Update(self: in out Clock_T) is
     begin
-        DrawClockFace(center, radius);
-        DrawLineEx(center, hour_v, 2.0, BLACK);
-        DrawLineEx(center, minute_v, 2.0, BLACK);
-        DrawLineEx(center, second_v, 2.0, RED);
+        self.ntime := Ada.Calendar.Clock;
     end;
 
 end Clock;

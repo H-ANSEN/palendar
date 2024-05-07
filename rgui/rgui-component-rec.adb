@@ -1,7 +1,7 @@
 
 package body RGUI.Component.Rec is
 
-    overriding procedure Draw(self: Rec_T) is 
+    overriding procedure Draw(self: in out Rec_T) is 
     begin 
         DrawRectangleRec((self.x, self.y, self.width, self.height), self.bg_color);     
     end;
