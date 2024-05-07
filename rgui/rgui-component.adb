@@ -10,4 +10,9 @@ package body RGUI.Component is
         self.height := bounds.height;
     end;
 
+    function GetBounds(self: Component_T) return Rectangle is
+    begin
+        return (self.x, self.y, self.width, self.height);
+    end;
+
 end RGUI.Component;

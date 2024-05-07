@@ -18,6 +18,7 @@ package RGUI.Component is
 -- Provided Def ----------------------------------------------------------------
 
     procedure SetBounds(self: out Component_T; bounds: Rectangle);
+    function GetBounds(self: Component_T) return Rectangle;
 
 -- Types -----------------------------------------------------------------------
 
