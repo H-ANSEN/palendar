@@ -31,6 +31,12 @@ package Raylib is
         format  : int;
     end record with Convention => C_Pass_By_Copy;
 
+    type RenderTexture is record
+        id      : unsigned;
+        texture : Texture2D;
+        depth   : Texture2D;
+    end record with Convention => C_Pass_By_Copy;
+
     type Image is record
         data    : VoidPtr;
         width   : int;
@@ -161,11 +167,20 @@ package Raylib is
         Convention => C,
         External_Name => "EndMode2D";
 
+    procedure BeginTextureMode(texture: RenderTexture) with
+        Import => True,
+        Convention => C,
+        External_Name => "BeginTextureMode";
+        
+    procedure EndTextureMode with
+        Import => True,
+        Convention => C,
+        External_Name => "EndTextureMode";
+
     procedure SetTargetFPS(fps: int) with
         Import => True,
         Convention => C,
         External_Name => "SetTargetFPS";
-
 
     function GetFontDefault return Font with
         Import => True,
@@ -186,6 +201,21 @@ package Raylib is
         Import => True,
         Convention => C,
         External_Name => "UnloadFont";
+
+    function LoadRenderTexture(width, height: Integer) return RenderTexture with
+        Import => True,
+        Convention => C,
+        External_Name => "LoadRenderTexture";
+
+    procedure UnloadRenderTexture(texture: RenderTexture) with
+        Import => True,
+        Convention => C,
+        External_Name => "UnloadRenderTexture";
+
+    procedure DrawTextureRec(texture: Texture2D; rec: Rectangle; pos: Vector2; tint: Color) with
+        Import => True,
+        Convention => C,
+        External_Name => "DrawTextureRec";
 
     procedure DrawText(text: in char_array; posX, posY, fontSize: Integer; col: Color) with
         Import => True,
@@ -256,5 +286,7 @@ package Raylib is
         Import => True,
         Convention => C,
         External_Name => "IsKeyPressed";
+
+    procedure DrawCenteredText(text: String; size: Float; fnt: Font; col: Color; rec: Rectangle);
     
 end Raylib;
