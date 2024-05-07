@@ -63,6 +63,16 @@ package Raylib is
         zoom: Float;
     end record with Convention => C_Pass_By_Copy;
 
+    type KeyboardKey is (
+        KEY_RIGHT,
+        KEY_LEFT
+    );
+
+    for KeyboardKey use (
+        KEY_RIGHT => 262,
+        KEY_LEFT  => 263
+    );
+
     type TextureFilter is (
         TEXTURE_FILTER_POINT,
         TEXTURE_FILTER_BILINEAR,
@@ -147,6 +157,11 @@ package Raylib is
         Convention => C,
         External_Name => "LoadFont";
 
+    function LoadFontEx(fileName: char_array; fontSize: int; codepoints: access int; codepointCount: int) return Font with
+        Import => True,
+        Convention => C,
+        External_Name => "LoadFontEx";
+
     procedure UnloadFont(fnt: Font) with
         Import => True,
         Convention => C,
@@ -202,4 +217,14 @@ package Raylib is
         Convention => C,
         External_Name => "SetTextureFilter";
 
+    function GetMousePosition return Vector2 with
+        Import => True,
+        Convention => C,
+        External_Name => "GetMousePosition";
+
+    function IsKeyPressed(key: KeyboardKey) return C_Bool with
+        Import => True,
+        Convention => C,
+        External_Name => "IsKeyPressed";
+    
 end Raylib;
