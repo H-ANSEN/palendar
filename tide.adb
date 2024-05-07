@@ -1,5 +1,6 @@
 with Interfaces.C; use Interfaces.C;
 with Ada.Calendar; 
+with Ada.Text_IO;
 
 with Raylib; use Raylib;
 with Clock; use Clock;
@@ -13,22 +14,21 @@ procedure Tide is
     clock_pos : constant Vector2 := (screen_center_v.x - 230.0, screen_center_v.y - 100.0);
     calendar_pos : constant Vector2 := (screen_center_v.x + 30.0, screen_center_v.y - 100.0);
 
-    fnt    : Font;
+    cal  : Calendar_T; 
 begin
     InitWindow(screen_w, screen_h, To_C("tide"));
     SetTargetFPS(60);
 
-    fnt := LoadFont(To_C("Retron2000.ttf"));
-    SetTextureFilter(fnt.texture, TEXTURE_FILTER_POINT);
+    cal := CalendarMake(calendar_pos);
 
     while not WindowShouldClose loop
         BeginDrawing;
             ClearBackground(WHITE);
             DrawClock(Ada.Calendar.Clock, clock_pos, 100.0);
-            DrawCalendar(Ada.Calendar.Clock, calendar_pos, fnt);
+            cal.Draw;
         EndDrawing;
     end loop;
 
-    UnloadFont(fnt);
+    CalendarDestory(cal);
     CloseWindow;
 end Tide;

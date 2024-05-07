@@ -1,10 +1,6 @@
 with Ada.Calendar; use Ada.Calendar;
 with Ada.Calendar.Formatting; use Ada.Calendar.Formatting; 
 
-with Ada.Text_IO;
-with Ada.Strings; use Ada.Strings;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-
 with Interfaces.C; use Interfaces.C; 
 with Raylib; use Raylib;
 
@@ -73,18 +69,12 @@ package body Cal is
         );
     end;
 
--- Private Drawing -------------------------------------------------------------
-
-    procedure DrawCenteredText(text: String; size: Float; fnt: Font; col: Color; rec: Rectangle) is
-        text_size     : Vector2;
-        text_draw_pos : Vector2;
+    function month_start(ntime : Time) return Integer is
     begin
-        text_size := MeasureTextEx(fnt, To_C(Trim(text, Both)), size, 1.0);
-        text_draw_pos.x := rec.x + (rec.width - text_size.x) / 2.0;
-        text_draw_pos.y := rec.y + (rec.height - text_size.y) / 2.0;
-
-        DrawTextEx(fnt, To_C(Trim(text, Both)), text_draw_pos, size, 1.0, col);
+        return Integer(week_num_of(AC.Year(ntime), AC.Month(ntime), 1));
     end;
+
+-- Private Drawing -------------------------------------------------------------
 
     procedure DrawCalendarBackground(pos: Vector2; rows: Integer) is
         cell_w : Float := Float(cell_width);
@@ -166,36 +156,65 @@ package body Cal is
 
 -- Public ----------------------------------------------------------------------
 
-    procedure DrawCalendar(now: Time; pos: Vector2; fnt: Font) is
-        year  : Year_Number  := Integer(Ada.Calendar.Year(now));
-        month : Month_Number := Integer(Ada.Calendar.Month(now));
-        day   : Day_Number   := Integer(Ada.Calendar.Day(now));
-
-        month_start  : Integer; -- 0..6 day of the week the month starts on
-        cells_needed : Integer; -- cells in the calendar needed to draw all days
-        rows_needed  : Integer; -- rows needed to fit cells in columns of '7'
-    begin
-        month_start  := Integer(week_num_of(year, month, 1));
-        cells_needed := month_start + days_in_month(year, month);
-        rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
-
-        DrawCalendarBackground(pos, rows_needed);
-        DrawCalendarHeader(pos, fnt);
-        DrawCalendarNumbers(pos, fnt, year, month, month_start);
-        DrawDayHighlight(pos, day, month_start);
-        DrawCalendarGrid(pos, rows_needed);
+    function CalendarMake(pos: Vector2) return Calendar_T is
+        cal_fnt : Font := LoadFont("Retron2000.ttf");
+    begin 
+        SetTextureFilter(cal_fnt.texture, TEXTURE_FILTER_BILINEAR);
+        return (
+            pos => pos,
+            fnt => cal_fnt,
+            tex => LoadRenderTexture(231, 200),
+            others => <>
+        );
     end;
 
-    function CalendarCellClicked(now: Time; pos: Vector2) return Integer is
-        cal_w : Float := Float(cell_width * 7);
-        cal_h : Float := Float(cell_height * 6);
-        cal_bounds : Rectangle := (pos.x, pos.y + Float(cell_height), cal_w, cal_h);
+    procedure CalendarDestory(cal: Calendar_T) is
+    begin
+        UnloadRenderTexture(cal.tex);
+        UnloadFont(cal.fnt);
+    end;
+    
+    procedure Draw(self: in out Calendar_T) is
+        year  : Year_Number;
+        month : Month_Number;
+        day   : Day_Number;  
 
-        year  : Year_Number  := Integer(Ada.Calendar.Year(now));
-        month : Month_Number := Integer(Ada.Calendar.Month(now));
-        month_start : Integer;
+        cells_needed : Integer;
+        rows_needed  : Integer;
+    begin
+        if self.dirty then
+            year  := AC.Year(self.now);
+            month := AC.Month(self.now);
+            day   := AC.Day(self.now);
 
-        mousePos : Vector2 := GetMousePosition;
+            cells_needed := self.start_day + days_in_month(year, month);
+            rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
+
+            BeginTextureMode(self.tex);
+                ClearBackground(WHITE);
+
+                -- Drawing occurs realitive to the top left of texture
+                DrawCalendarBackground((0.0, 0.0), rows_needed);
+                DrawCalendarHeader((0.0, 0.0), self.fnt);
+                DrawDayHighlight((0.0, 0.0), day, self.start_day);
+                DrawCalendarNumbers((0.0, 0.0), self.fnt, year, month, self.start_day);
+                DrawCalendarGrid((0.0, 0.0), rows_needed);
+            EndTextureMode;
+
+            self.dirty := False;
+        end if;
+
+        DrawTextureRec(self.tex.texture, 
+                       (0.0, 0.0, Float(self.tex.texture.width), Float(-self.tex.texture.height)), 
+                       self.pos, 
+                       WHITE);
+    end;
+
+    function CalendarCellClicked(self: Calendar_T) return Integer is
+        cal_w      : Float     := Float(cell_width * 7);
+        cal_h      : Float     := Float(cell_height * 6);
+        cal_bounds : Rectangle := (self.pos.x, self.pos.y + Float(cell_height), cal_w, cal_h);
+        mousePos   : Vector2   := GetMousePosition;
 
         cell_x : Integer;
         cell_y : Integer;
@@ -203,20 +222,13 @@ package body Cal is
         if CheckCollisionPointRec(mousePos, cal_bounds) and
            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) then
 
-            cell_y := Integer(mousePos.y - (pos.y + Float(cell_height))) / cell_height;
-            cell_x := Integer(mousePos.x - pos.x) / cell_width;
-            month_start  := Integer(week_num_of(year, month, 1));
+            cell_y := Integer(mousePos.y - (self.pos.y + Float(cell_height))) / cell_height;
+            cell_x := Integer(mousePos.x - self.pos.x) / cell_width;
 
-
-            return cell_y * 7 + cell_x - month_start + 1;
+            return cell_y * 7 + cell_x - self.start_day + 1;
         end if;
 
         return 0;
     end;
 
 end Cal;
-
-
-
-
-
