@@ -1,84 +1,90 @@
 with RGUI.Component; use RGUI.Component;
 
 package body RGUI.Layout.Grid is
+-- TODO handle inset
 
 -- Private ---------------------------------------------------------------------
 
-    function RowPreferredHeight(self: Grid_T; row: Integer) return Float is
-        max  : Float := 0.0;
-        comp : ComponentRef;
+    function RowMinimumSize(self: Grid_T; row: Integer) return Vector2 is
+        width  : Float := 0.0;
+        height : Float := 0.0;
+        comp   : ComponentRef;
     begin
         for col in 1..self.cols loop
             comp := self.components(row, col);
-
             if comp /= null then
-                max := Float'Max(max, comp.pref_size.y);
+                width  := width + comp.min_size.x + self.vgap;
+                height := Float'Max(height, comp.min_size.y);
             end if;
         end loop;
 
-        return max;
+        return (width - self.vgap, height);
     end;
 
-    function RowPreferredWidth(self: Grid_T; row: Integer) return Float is
-        max  : Float := 0.0;
-        comp : ComponentRef;
+    function GridMinimumSize(self: Grid_T) return Vector2 is
+        width  : Float := 0.0;
+        height : Float := 0.0;
+        size   : Vector2;
     begin
-        for col in 1..self.cols loop
-            comp := self.components(row, col);
-
-            if comp /= null then
-                max := max + comp.pref_size.x + self.vgap;
-            end if;
+        for row in 1..self.rows loop
+            size   := RowMinimumSize(self, row); 
+            width  := Float'Max(width, size.x);
+            height := height + size.y + self.hgap;
         end loop;
 
-        return max - self.vgap;
+        return (width, height - self.hgap);
     end;
     
 -- Public ----------------------------------------------------------------------
 
     overriding procedure LayoutComponents(self: Grid_T; bounds: Rectangle) is
-        top  : Float := bounds.y + self.inset.top;
-        left : Float := bounds.x + self.inset.left;
-        
+        top  : Float   := bounds.y;
+        left : Float   := bounds.x;
+        min  : Vector2 := GridMinimumSize(self);
+
         scale_factor : Float;
         scale        : Float;
+        max_height   : Float := 0.0;
         comp         : ComponentRef;
     begin
-        for row in 1..self.rows loop
+        for row in 1..self.rows loop 
+            left := bounds.x;
             for col in 1..self.cols loop
                 comp := self.components(row, col);
-
                 if comp /= null then
+
                     comp.x := left;
                     comp.y := top;
 
-                    if bounds.width < comp.pref_size.x then
-                        scale_factor := bounds.width / RowPreferredWidth(self, row);
-                        scale        := comp.pref_size.x * scale_factor;
-                        comp.width   := scale;
+                    scale_factor := bounds.width / min.x;
+                    scale        := comp.min_size.x * scale_factor;
+                    comp.width   := Float'Max(scale, comp.min_size.x);
+
+                    if col /= 1 then
+                        comp.x   := comp.x + (self.vgap * scale_factor);
                     end if;
 
-                    if bounds.height < comp.pref_size.y then
-                        scale_factor := bounds.height / RowPreferredHeight(self, row);
-                        scale        := comp.pref_size.y * scale_factor;
-                        comp.height  := scale;
-                    end if;
+                    scale_factor := bounds.height / min.y;
+                    scale        := comp.min_size.y * scale_factor;
+                    comp.height  := Float'Max(scale, comp.min_size.y);
 
                     if row /= 1 then
-                        comp.y := comp.y - (comp.pref_size.y - scale);
+                        comp.y   := comp.y + (self.hgap * scale_factor);
                     end if;
 
-                    left := left + self.vgap + comp.width;
+                    max_height   := Float'Max(max_height, comp.height);
+                    left         := left + comp.width;
+
                 end if;
             end loop;
-            top  := top + self.hgap + RowPreferredHeight(self, row);
-            left := bounds.x + self.inset.left;
+            top := top + max_height;
+            max_height := 0.0;
         end loop;
     end;
      
     overriding function MinimumSize(self: Grid_T) return Vector2 is
     begin
-        return (0.0, 0.0);
+        return GridMinimumSize(self);
     end;
 
 end RGUI.Layout.Grid;

@@ -202,4 +202,9 @@ package Raylib is
         Convention => C,
         External_Name => "SetTextureFilter";
 
+    function GetMousePosition return Vector2 with
+        Import => True,
+        Convention => C,
+        External_Name => "GetMousePosition";
+
 end Raylib;

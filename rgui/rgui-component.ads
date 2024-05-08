@@ -5,8 +5,8 @@ package RGUI.Component is
 -- Abstract Component Def ------------------------------------------------------
 
     type Component_T is abstract tagged record
-        x, y          : Float;
-        width, height : Float;
+        x, y          : Float    := 0.0;
+        width, height : Float    := 100.0;
         pref_size     : Vector2;
         min_size      : Vector2;
         bg_color      : Color;
