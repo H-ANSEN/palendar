@@ -21,6 +21,7 @@ package Cal is
 
     overriding procedure Draw(self: in out Calendar_T);
     overriding procedure Update(self: in out Calendar_T);
+    procedure CalendarIncrement(self: in out Calendar_T);
 
     function CalendarCellClicked(self: Calendar_T) return Integer;
 

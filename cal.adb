@@ -17,6 +17,7 @@ procedure DrawCalendarHeader(pos: Vector2; fnt: Font);
 procedure DrawCalendarNumbers(pos: Vector2; fnt: Font; year, month, start_day: Integer);
 procedure DrawCalendarGrid(pos: Vector2; rows: Integer);
 procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Color);
+procedure DrawYearMonth(pos: Vector2; year, month: Integer; fnt: Font);
 
 -- Public ----------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Col
         rows_needed  : Integer;
     begin
         cell_width   := Integer(self.width / 7.0);
-        cell_height  := Integer(self.height / 7.0);
+        cell_height  := Integer(self.width / 6.0);
 
         cells_needed := self.start_day + days_in_month(year, month);
         rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
@@ -41,6 +42,7 @@ procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Col
         DrawCalendarNumbers(pos, self.fnt, year, month, self.start_day);
         DrawDayHighlight(pos, self, day, (0, 255, 0, 150));
         DrawCalendarGrid(pos, rows_needed);
+        DrawYearMonth(pos, year, month, self.fnt);
 
         if CalendarCellClicked(self) > 0 and CalendarCellClicked(self) <= self.month_days then
             DrawDayHighlight(pos, self, CalendarCellClicked(self), (0, 0, 38, 140));
@@ -69,6 +71,19 @@ procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Col
         end if;
 
         return 0;
+    end;
+
+    procedure CalendarIncrement(self: in out Calendar_T) is
+        nyear  : Year_Number  := AC.Year(self.now);
+        nmonth : Month_Number := AC.Month(self.now);
+        nday   : Day_Number   := AC.Day(self.now);
+    begin
+        nmonth := (if nmonth = 12 then 1 else nmonth + 1);
+        nyear  := (if nmonth = 1 then nyear + 1 else nyear);
+
+        self.now        := AC.Time_Of(nyear, nmonth, nday);
+        self.start_day  := month_start(self.now);
+        self.month_days := days_in_month(AC.Year(self.now), AC.Month(self.now));
     end;
 
 -- Private Helper --------------------------------------------------------------
@@ -197,6 +212,14 @@ procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Col
         cell_x := pos.x + Float(cell_width * ((day + cal.start_day - 1) mod 7));
         cell_y := pos.y + Float(cell_height * ((day + cal.start_day - 1) / 7)) + Float(cell_height);
         DrawRectangleRec((cell_x + 1.0, cell_y + 1.0, Float(cell_width - 1), Float(cell_height - 1)), col);
+    end;
+
+    procedure DrawYearMonth(pos: Vector2; year, month: Integer; fnt: Font) is
+        rec : Rectangle := (pos.x, pos.y - Float(cell_height) + 1.0, Float(cell_width) * 7.0, Float(cell_height));
+        str : String := Integer'Image(month) & "/" & Integer'Image(year);
+    begin
+        --DrawRectangleLinesEx(rec, 2.0, BLACK);
+        DrawCenteredText(Integer'Image(month) & "/" & Integer'Image(year), fnt_size, fnt, BLACK, rec);
     end;
 
 end Cal;
