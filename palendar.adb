@@ -12,40 +12,10 @@ with RGUI.Layout.Grid; use RGUI.Layout.Grid;
 
 procedure Palendar is
 
-    bounds : Rectangle := (0.0, 0.0, 0.0, 0.0);
-
-    child_rec : ComponentRef := new Rec_T'(
+    window_rec : ComponentRef := new Rec_T'(
         pref_size => (100.0, 100.0),
         min_size  => (50.0, 50.0),
-        bg_color  => (255, 255, 255, 255),
-        others    => <>
-    );
-
-    blue_rec : ComponentRef := new Rec_T'(
-        pref_size => (50.0, 50.0),
-        min_size  => (50.0, 50.0),
-        bg_color  => (0, 0, 255, 150),
-        others    => <>
-    );
-
-    black_rec : ComponentRef := new Rec_T'(
-        pref_size => (50.0, 50.0),
-        min_size  => (50.0, 50.0),
-        bg_color  => (0, 0, 0, 150),
-        others    => <>
-    );
-
-    red_rec : ComponentRef := new Rec_T'(
-        pref_size => (50.0, 50.0),
-        min_size  => (50.0, 50.0),
-        bg_color  => (255, 0, 0, 150),
-        others    => <>
-    );
-
-    green_rec : ComponentRef := new Rec_T'(
-        pref_size => (50.0, 50.0),
-        min_size  => (50.0, 50.0),
-        bg_color  => (0, 255, 0, 150),
+        bg_color  => (255, 250, 255, 255),
         others    => <>
     );
 
@@ -63,19 +33,11 @@ procedure Palendar is
         others => <>
     );
 
-    border_layout : Border_T := (
-        left   => blue_rec,
-        right  => red_rec,
-        top    => green_rec,
-        bottom => black_rec,
-        center => child_rec,
-        others => <>
-    );
-
     grid_layout : Grid_T := (
         rows   => 1,
         cols   => 2,
-        vgap   => 10.0,
+        vgap   => 50.0,
+        inset  => (90.0, 50.0, 50.0, 50.0),
         others => <>
     );
 
@@ -86,9 +48,7 @@ procedure Palendar is
 begin
     grid_layout.components(1, 1) := clock_comp;
     grid_layout.components(1, 2) := calendar_comp;
-
-    child_rec.min_size := grid_layout.MinimumSize;
-    minSize := border_layout.MinimumSize;
+    window_rec.min_size := grid_layout.MinimumSize;
     
     InitWindow(screen_w, screen_h, To_C("Palendar"));
     SetTargetFPS(60);
@@ -98,21 +58,10 @@ begin
 
     while not WindowShouldClose loop
         mousePos := GetMousePosition;
+        window_rec.width  := Float'Max(mousePos.x, window_rec.min_size.x);
+        window_rec.height := Float'Max(mousePos.y, window_rec.min_size.y);
 
-        if mousePos.x < minSize.x then 
-            bounds.width := minSize.x;
-        else 
-            bounds.width := mousePos.x;
-        end if;
-
-        if mousePos.y < minSize.y then 
-            bounds.height := minSize.y;
-        else 
-            bounds.height := mousePos.y;
-        end if;
-
-        border_layout.LayoutComponents(bounds);
-        grid_layout.LayoutComponents(child_rec.GetBounds);
+        grid_layout.LayoutComponents(window_rec.GetBounds);
 
         clock_comp.Update;
         calendar_comp.Update;
@@ -120,11 +69,7 @@ begin
         BeginDrawing;
             ClearBackground(WHITE);
 
-            child_rec.Draw;
-            red_rec.Draw;
-            blue_rec.Draw;
-            green_rec.Draw;
-            black_rec.Draw;
+            window_rec.Draw;
             clock_comp.Draw;
             calendar_comp.Draw;
         EndDrawing;
