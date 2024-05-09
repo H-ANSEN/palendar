@@ -31,6 +31,12 @@ package Raylib is
         format  : int;
     end record with Convention => C_Pass_By_Copy;
 
+    type RenderTexture is record
+        id      : unsigned;
+        texture : Texture2D;
+        depth   : Texture2D;
+    end record with Convention => C_Pass_By_Copy;
+
     type Image is record
         data    : VoidPtr;
         width   : int;
@@ -62,6 +68,36 @@ package Raylib is
         rotation: Float;
         zoom: Float;
     end record with Convention => C_Pass_By_Copy;
+
+    type KeyboardKey is (
+        KEY_RIGHT,
+        KEY_LEFT
+    );
+
+    for KeyboardKey use (
+        KEY_RIGHT => 262,
+        KEY_LEFT  => 263
+    ); 
+        
+    type MouseButton is ( 
+        MOUSE_BUTTON_LEFT,
+        MOUSE_BUTTON_RIGHT,
+        MOUSE_BUTTON_MIDDLE,
+        MOUSE_BUTTON_SIDE,
+        MOUSE_BUTTON_EXTRA,
+        MOUSE_BUTTON_FORWARD,
+        MOUSE_BUTTON_BACK
+    );
+    
+    for MouseButton use ( 
+        MOUSE_BUTTON_LEFT    => 0,
+        MOUSE_BUTTON_RIGHT   => 1,
+        MOUSE_BUTTON_MIDDLE  => 2,
+        MOUSE_BUTTON_SIDE    => 3,
+        MOUSE_BUTTON_EXTRA   => 4,
+        MOUSE_BUTTON_FORWARD => 5,
+        MOUSE_BUTTON_BACK    => 6 
+    );
 
     type TextureFilter is (
         TEXTURE_FILTER_POINT,
@@ -131,11 +167,20 @@ package Raylib is
         Convention => C,
         External_Name => "EndMode2D";
 
+    procedure BeginTextureMode(texture: RenderTexture) with
+        Import => True,
+        Convention => C,
+        External_Name => "BeginTextureMode";
+        
+    procedure EndTextureMode with
+        Import => True,
+        Convention => C,
+        External_Name => "EndTextureMode";
+
     procedure SetTargetFPS(fps: int) with
         Import => True,
         Convention => C,
         External_Name => "SetTargetFPS";
-
 
     function GetFontDefault return Font with
         Import => True,
@@ -147,10 +192,30 @@ package Raylib is
         Convention => C,
         External_Name => "LoadFont";
 
+    function LoadFontEx(fileName: char_array; fontSize: int; codepoints: access int; codepointCount: int) return Font with
+        Import => True,
+        Convention => C,
+        External_Name => "LoadFontEx";
+
     procedure UnloadFont(fnt: Font) with
         Import => True,
         Convention => C,
         External_Name => "UnloadFont";
+
+    function LoadRenderTexture(width, height: Integer) return RenderTexture with
+        Import => True,
+        Convention => C,
+        External_Name => "LoadRenderTexture";
+
+    procedure UnloadRenderTexture(texture: RenderTexture) with
+        Import => True,
+        Convention => C,
+        External_Name => "UnloadRenderTexture";
+
+    procedure DrawTextureRec(texture: Texture2D; rec: Rectangle; pos: Vector2; tint: Color) with
+        Import => True,
+        Convention => C,
+        External_Name => "DrawTextureRec";
 
     procedure DrawText(text: in char_array; posX, posY, fontSize: Integer; col: Color) with
         Import => True,
@@ -202,9 +267,26 @@ package Raylib is
         Convention => C,
         External_Name => "SetTextureFilter";
 
+    function CheckCollisionPointRec(point: Vector2; rec: Rectangle) return C_Bool with
+        Import => True,
+        Convention => C,
+        External_Name => "CheckCollisionPointRec";
+
+    function IsMouseButtonPressed(btn: MouseButton) return C_Bool with
+        Import => True,
+        Convention => C,
+        External_Name => "IsMouseButtonPressed";
+
     function GetMousePosition return Vector2 with
         Import => True,
         Convention => C,
         External_Name => "GetMousePosition";
 
+    function IsKeyPressed(key: KeyboardKey) return C_Bool with
+        Import => True,
+        Convention => C,
+        External_Name => "IsKeyPressed";
+
+    procedure DrawCenteredText(text: String; size: Float; fnt: Font; col: Color; rec: Rectangle);
+    
 end Raylib;

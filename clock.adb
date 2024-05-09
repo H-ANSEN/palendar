@@ -22,21 +22,16 @@ package body Clock is
         return (radius * Cos(rad), radius * Sin(rad));
     end;
 
-    function second_hand_v(second : Second_Number; 
-                           center : Vector2; 
-                           radius : Float) return Vector2 is
-
+    function second_hand_v(second : Second_Number; center : Vector2; radius : Float) return Vector2 
+    is
         second_rad : constant Float   := degree_to_radian(Float((second * 6) - 90));
         second_v   : constant Vector2 := polar_to_cartesian(radius, second_rad);
     begin
-        return (second_v.x + center.x, 
-                second_v.y + center.y);
+        return (second_v.x + center.x, second_v.y + center.y);
     end;
 
-    function minute_hand_v(minute : Minute_Number; 
-                           center : Vector2; 
-                           radius : Float) return Vector2 is
-
+    function minute_hand_v(minute : Minute_Number; center : Vector2; radius : Float) return Vector2 
+    is
         minute_rad : constant Float   := degree_to_radian(Float((minute * 6) - 90));
         minute_v   : constant Vector2 := polar_to_cartesian(radius, minute_rad);
     begin
@@ -44,15 +39,12 @@ package body Clock is
                 minute_v.y + center.y);
     end;
 
-    function hour_hand_v(hour: Hour_Number; 
-                         center: Vector2; 
-                         radius: Float) return Vector2 is
-
+    function hour_hand_v(hour: Hour_Number; center: Vector2; radius: Float) return Vector2 
+    is
         hour_rad : constant Float   := degree_to_radian((Float(hour mod 12) * 30.0) - 90.0);
         hour_v   : constant Vector2 := polar_to_cartesian(radius, hour_rad);
     begin
-        return (hour_v.x + center.x,
-                hour_v.y + center.y);
+        return (hour_v.x + center.x, hour_v.y + center.y);
     end;
 
 -- Private Drawing -------------------------------------------------------------

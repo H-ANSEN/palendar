@@ -1,5 +1,4 @@
 with Interfaces.C; use Interfaces.C;
-with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Calendar; 
 
 with Raylib; use Raylib;
@@ -50,7 +49,7 @@ procedure Palendar is
         others    => <>
     );
 
-    clock_comp    : ComponentRef := new Clock_T'(
+    clock_comp : ComponentRef := new Clock_T'(
         pref_size => (200.0, 200.0),
         min_size  => (200.0, 200.0),
         bg_color  => (0, 255, 0, 150),
@@ -58,8 +57,8 @@ procedure Palendar is
     );
 
     calendar_comp : ComponentRef := new Calendar_T'(
-        pref_size => (231.0, 200.0),
-        min_size  => (231.0, 200.0),
+        pref_size => (200.0, 200.0),
+        min_size  => (200.0, 200.0),
         bg_color  => (0, 255, 0, 150),
         others => <>
     );
@@ -80,17 +79,10 @@ procedure Palendar is
         others => <>
     );
 
-    screen_w : constant Integer := 600;
-    screen_h : constant Integer := 400;
-    screen_center_v : constant Vector2 := (Float(screen_w / 2), Float(screen_h / 2));
-
-    clock_pos : constant Vector2 := (screen_center_v.x - 230.0, screen_center_v.y - 100.0);
-    calendar_pos : constant Vector2 := (screen_center_v.x + 30.0, screen_center_v.y - 100.0);
-
-    fnt : Font;
-
     mousePos : Vector2;
     minSize  : Vector2; 
+    screen_w : constant Integer := 600;
+    screen_h : constant Integer := 400;
 begin
     grid_layout.components(1, 1) := clock_comp;
     grid_layout.components(1, 2) := calendar_comp;
@@ -98,12 +90,11 @@ begin
     child_rec.min_size := grid_layout.MinimumSize;
     minSize := border_layout.MinimumSize;
     
-    InitWindow(screen_w, screen_h, To_C("tide"));
+    InitWindow(screen_w, screen_h, To_C("Palendar"));
     SetTargetFPS(60);
 
-    fnt := LoadFont(To_C("Retron2000.ttf"));
-    SetTextureFilter(fnt.texture, TEXTURE_FILTER_POINT);
-    Calendar_T(calendar_comp.all).fnt := fnt;
+    Calendar_T(calendar_comp.all).fnt := LoadFont("Retron2000.ttf");
+    SetTextureFilter(Calendar_T(calendar_comp.all).fnt.texture, TEXTURE_FILTER_BILINEAR);
 
     while not WindowShouldClose loop
         mousePos := GetMousePosition;
@@ -136,12 +127,9 @@ begin
             black_rec.Draw;
             clock_comp.Draw;
             calendar_comp.Draw;
-
-            --DrawClock(Ada.Calendar.Clock, clock_pos, 100.0);
-            --DrawCalendar(Ada.Calendar.Clock, calendar_pos, fnt);
         EndDrawing;
     end loop;
 
-    UnloadFont(fnt);
+    UnloadFont(Calendar_T(calendar_comp.all).fnt);
     CloseWindow;
 end Palendar;
