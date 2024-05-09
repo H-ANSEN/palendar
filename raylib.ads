@@ -117,6 +117,14 @@ package Raylib is
         TEXTURE_FILTER_ANISOTROPIC_16X => 5
     );
 
+    type ConfigFlag is (
+        FLAG_WINDOW_RESIZABLE
+    );
+
+    for ConfigFlag use (
+        FLAG_WINDOW_RESIZABLE => 4
+    );
+
     PINK      : constant Color := (251, 162, 235, 255);
     LIGHTBLUE : constant Color := (130, 170, 251, 255);
     LIGHTGREY : constant Color := (146, 146, 146, 255);
@@ -141,6 +149,31 @@ package Raylib is
         Import => True,
         Convention => C,
         External_Name => "WindowShouldClose";
+
+    procedure SetWindowMinSize(width, height: Integer) with
+        Import => True,
+        Convention => C,
+        External_Name => "SetWindowMinSize";
+
+    function IsWindowResized return C_Bool with
+        Import => True,
+        Convention => C,
+        External_Name => "IsWindowResized";
+
+    function GetScreenWidth return Integer with
+        Import => True,
+        Convention => C,
+        External_Name => "GetScreenWidth";
+
+    function GetScreenHeight return Integer with
+        Import => True,
+        Convention => C,
+        External_Name => "GetScreenHeight";
+
+    procedure SetConfigFlags(flags: unsigned) with
+        Import => True,
+        Convention => C,
+        External_Name => "SetConfigFlags";
 
     procedure ClearBackground(col: Color) with
         Import => True,
