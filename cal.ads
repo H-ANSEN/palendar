@@ -13,6 +13,7 @@ package Cal is
     function CalendarMake(pos: Vector2) return Calendar_T; 
 
 private
+
     package AC renames Ada.Calendar;
     type Week_Number is range 0..6;
 
@@ -21,10 +22,8 @@ private
 
     type Calendar_T is tagged record
         pos : Vector2;       -- Top left origin position
-        tex : RenderTexture; -- Texture Calendar is drawn to
         fnt : Font;          -- Font used in drawing
 
-        dirty      : Boolean := True;
         now        : Time    := AC.Clock;
         start_day  : Integer := month_start(AC.Clock);
         month_days : Integer := days_in_month(AC.Year(AC.Clock), AC.Month(AC.Clock));

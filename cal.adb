@@ -27,14 +27,12 @@ procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Col
         return (
             pos => pos,
             fnt => cal_fnt,
-            tex => LoadRenderTexture(231, 200),
             others => <>
         );
     end;
 
     procedure CalendarDestory(cal: Calendar_T) is
     begin
-        UnloadRenderTexture(cal.tex);
         UnloadFont(cal.fnt);
     end;
     
@@ -45,34 +43,19 @@ procedure DrawDayHighlight(pos: Vector2; cal: Calendar_T; day: Integer; col: Col
 
         cells_needed : Integer;
         rows_needed  : Integer;
-
-        bounds : constant Rectangle := (
-            x => 0.0, y => 0.0,
-            width => Float(self.tex.texture.width),
-            height => Float(-self.tex.texture.height)
-        );
     begin
-        if self.dirty then
-            year  := AC.Year(self.now);
-            month := AC.Month(self.now);
-            day   := AC.Day(self.now);
+        year  := AC.Year(self.now);
+        month := AC.Month(self.now);
+        day   := AC.Day(self.now);
 
-            cells_needed := self.start_day + days_in_month(year, month);
-            rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
+        cells_needed := self.start_day + days_in_month(year, month);
+        rows_needed  := Integer(Float'Ceiling(Float(cells_needed) / 7.0));
 
-            BeginTextureMode(self.tex);
-                ClearBackground(WHITE);
-                DrawCalendarBackground((0.0, 0.0), rows_needed);
-                DrawCalendarHeader((0.0, 0.0), self.fnt);
-                DrawCalendarNumbers((0.0, 0.0), self.fnt, year, month, self.start_day);
-                DrawDayHighlight((0.0, 0.0), self, day, (0, 255, 0, 150));
-                DrawCalendarGrid((0.0, 0.0), rows_needed);
-            EndTextureMode;
-
-            self.dirty := False;
-        end if;
-
-        DrawTextureRec(self.tex.texture, bounds, self.pos, WHITE);
+        DrawCalendarBackground(self.pos, rows_needed);
+        DrawCalendarHeader(self.pos, self.fnt);
+        DrawCalendarNumbers(self.pos, self.fnt, year, month, self.start_day);
+        DrawDayHighlight(self.pos, self, day, (0, 255, 0, 150));
+        DrawCalendarGrid(self.pos, rows_needed);
 
         if CalendarCellClicked(self) > 0 and CalendarCellClicked(self) <= self.month_days then
             DrawDayHighlight(self.pos, self, CalendarCellClicked(self), (0, 0, 38, 140));
