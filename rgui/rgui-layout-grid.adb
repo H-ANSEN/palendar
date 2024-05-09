@@ -1,7 +1,6 @@
 with RGUI.Component; use RGUI.Component;
 
 package body RGUI.Layout.Grid is
--- TODO handle inset
 
 -- Private ---------------------------------------------------------------------
 
@@ -32,14 +31,17 @@ package body RGUI.Layout.Grid is
             height := height + size.y + self.hgap;
         end loop;
 
+        width := width + self.inset.left + self.inset.right;
+        height := height + self.inset.top + self.inset.bottom;
+
         return (width, height - self.hgap);
     end;
     
 -- Public ----------------------------------------------------------------------
 
     overriding procedure LayoutComponents(self: Grid_T; bounds: Rectangle) is
-        top  : Float   := bounds.y;
-        left : Float   := bounds.x;
+        top  : Float   := bounds.y + self.inset.top;
+        left : Float   := bounds.x + self.inset.left;
         min  : Vector2 := GridMinimumSize(self);
 
         scale_factor : Float;
@@ -48,7 +50,7 @@ package body RGUI.Layout.Grid is
         comp         : ComponentRef;
     begin
         for row in 1..self.rows loop 
-            left := bounds.x;
+            left := bounds.x + self.inset.left;
             for col in 1..self.cols loop
                 comp := self.components(row, col);
                 if comp /= null then
