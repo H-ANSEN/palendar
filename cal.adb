@@ -44,8 +44,8 @@ procedure DrawYearMonth(pos: Vector2; year, month: Integer; fnt: Font);
         DrawCalendarGrid(pos, rows_needed);
         DrawYearMonth(pos, year, month, self.fnt);
 
-        if CalendarCellClicked(self) > 0 and CalendarCellClicked(self) <= self.month_days then
-            DrawDayHighlight(pos, self, CalendarCellClicked(self), (0, 0, 38, 140));
+        if self.CalendarCellHovered /= -1 then
+            DrawDayHighlight(pos, self, self.CalendarCellHovered, (0, 0, 38, 140));
         end if;
     end;
 
@@ -54,23 +54,29 @@ procedure DrawYearMonth(pos: Vector2; year, month: Integer; fnt: Font);
         null;
     end;
 
-    function CalendarCellClicked(self: Calendar_T) return Integer is
+    function CalendarCellHovered(self: Calendar_T) return Integer is
         cal_w      : Float     := Float(cell_width * 7);
         cal_h      : Float     := Float(cell_height * 6);
         cal_bounds : Rectangle := (self.x, self.y + Float(cell_height), cal_w, cal_h);
         mousePos   : Vector2   := GetMousePosition;
 
+        index  : Integer;
         cell_x : Integer;
         cell_y : Integer;
     begin
         if CheckCollisionPointRec(mousePos, cal_bounds) then
             cell_y := Integer(mousePos.y - (self.y + Float(cell_height))) / cell_height;
             cell_x := Integer(mousePos.x - self.x) / cell_width;
+            index  := cell_y * 7 + cell_x - self.start_day + 1;
 
-            return cell_y * 7 + cell_x - self.start_day + 1;
+            if index > 0 and index <= days_in_month(AC.Year(self.now), AC.Month(self.now)) then
+                return index;
+            else 
+                return -1;
+            end if;
         end if;
 
-        return 0;
+        return -1;
     end;
 
     procedure CalendarIncrement(self: in out Calendar_T) is

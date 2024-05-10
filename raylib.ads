@@ -125,6 +125,16 @@ package Raylib is
         FLAG_WINDOW_RESIZABLE => 4
     );
 
+    type MouseCursor is (
+        MOUSE_CURSOR_DEFAULT,
+        MOUSE_CURSOR_POINTING_HAND
+    );
+
+    for MouseCursor use (
+        MOUSE_CURSOR_DEFAULT       => 0,
+        MOUSE_CURSOR_POINTING_HAND => 4
+    );
+
     PINK      : constant Color := (251, 162, 235, 255);
     LIGHTBLUE : constant Color := (130, 170, 251, 255);
     LIGHTGREY : constant Color := (146, 146, 146, 255);
@@ -314,6 +324,11 @@ package Raylib is
         Import => True,
         Convention => C,
         External_Name => "GetMousePosition";
+
+    procedure SetMouseCursor(cursor: MouseCursor) with
+        Import => True,
+        Convention => C,
+        External_Name => "SetMouseCursor";
 
     function IsKeyPressed(key: KeyboardKey) return C_Bool with
         Import => True,

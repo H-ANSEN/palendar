@@ -1,4 +1,5 @@
 with Raylib;
+with Ada.Text_IO;
 
 with RGUI.Component; use RGUI.Component;
 with Clock; use Clock;
@@ -60,13 +61,20 @@ package body Scene.Cal is
     end;
 
     overriding procedure Update(self: in out CalendarScene) is
+        cell_hovered : constant Integer := self.calendar_comp.CalendarCellHovered;
     begin
         if Raylib.IsWindowResized then
             self.bounds_rec.width  := Float'Max(Float(Raylib.GetScreenWidth), self.bounds_rec.min_size.x);
             self.bounds_rec.height := Float'Max(Float(Raylib.GetScreenHeight), self.bounds_rec.min_size.y);
             self.glayout.LayoutComponents(self.bounds_rec.GetBounds);
         end if;
-        
+
+        if cell_hovered /= -1 then
+            Raylib.SetMouseCursor(Raylib.MOUSE_CURSOR_POINTING_HAND);
+        else
+            Raylib.SetMouseCursor(Raylib.MOUSE_CURSOR_DEFAULT);
+        end if;
+
         self.clock_comp.Update;
         self.calendar_comp.Update;
     end;
