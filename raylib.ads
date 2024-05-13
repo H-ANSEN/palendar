@@ -145,195 +145,119 @@ package Raylib is
     WHITE     : constant Color := (255, 255, 255, 255);
     BLACK     : constant Color := (  0,   0,   0, 255);
 
-    procedure InitWindow(width, height: Integer; title: in char_array) with
-        Import => True,
-        Convention => C,
-        External_Name => "InitWindow";
+    procedure InitWindow(width, height: Integer; title: in char_array);
+    pragma Import(C, InitWindow, "InitWindow");
 
-    procedure CloseWindow with
-        Import => True,
-        Convention => C,
-        External_Name => "CloseWindow";
+    procedure CloseWindow;
+    pragma Import(C, CloseWindow, "CloseWindow");
 
-    function WindowShouldClose return C_Bool with
-        Import => True,
-        Convention => C,
-        External_Name => "WindowShouldClose";
+    function WindowShouldClose return C_Bool;
+    pragma Import(C, WindowShouldClose, "WindowShouldClose");
 
-    procedure SetWindowMinSize(width, height: Integer) with
-        Import => True,
-        Convention => C,
-        External_Name => "SetWindowMinSize";
+    procedure SetWindowMinSize(width, height: Integer);
+    pragma Import(C, SetWindowMinSize, "SetWindowMinSize");
 
-    function IsWindowResized return C_Bool with
-        Import => True,
-        Convention => C,
-        External_Name => "IsWindowResized";
+    function IsWindowResized return C_Bool;
+    pragma Import(C, IsWindowResized, "IsWindowResized");
 
-    function GetScreenWidth return Integer with
-        Import => True,
-        Convention => C,
-        External_Name => "GetScreenWidth";
+    function GetScreenWidth return Integer;
+    pragma Import(C, GetScreenWidth, "GetScreenWidth");
 
-    function GetScreenHeight return Integer with
-        Import => True,
-        Convention => C,
-        External_Name => "GetScreenHeight";
+    function GetScreenHeight return Integer;
+    pragma Import(C, GetScreenHeight, "GetScreenHeight");
 
-    procedure SetConfigFlags(flags: unsigned) with
-        Import => True,
-        Convention => C,
-        External_Name => "SetConfigFlags";
+    procedure SetConfigFlags(flags: unsigned);
+    pragma Import(C, SetConfigFlags, "SetConfigFlags");
 
-    procedure ClearBackground(col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "ClearBackground";
+    procedure ClearBackground(col: Color);
+    pragma Import(C, ClearBackground, "ClearBackground");
 
-    procedure BeginDrawing with
-        Import => True,
-        Convention => C,
-        External_Name => "BeginDrawing";
+    procedure BeginDrawing;
+    pragma Import(C, BeginDrawing, "BeginDrawing");
 
-    procedure EndDrawing with
-        Import => True,
-        Convention => C,
-        External_Name => "EndDrawing";
+    procedure EndDrawing;
+    pragma Import(C, EndDrawing, "EndDrawing");
 
-    procedure BeginMode2D(camera: Camera2D) with
-        Import => True,
-        Convention => C,
-        External_Name => "BeginMode2D";
+    procedure BeginMode2D(camera: Camera2D);
+    pragma Import(C, BeginMode2D, "BeginMode2D");
 
-    procedure EndMode2D with
-        Import => True,
-        Convention => C,
-        External_Name => "EndMode2D";
+    procedure EndMode2D;
+    pragma Import(C, EndMode2D, "EndMode2D");
 
-    procedure BeginTextureMode(texture: RenderTexture) with
-        Import => True,
-        Convention => C,
-        External_Name => "BeginTextureMode";
+    procedure BeginTextureMode(texture: RenderTexture);
+    pragma Import(C, BeginTextureMode, "BeginTextureMode");
         
-    procedure EndTextureMode with
-        Import => True,
-        Convention => C,
-        External_Name => "EndTextureMode";
+    procedure EndTextureMode;
+    pragma Import(C, EndTextureMode, "EndTextureMode");
 
-    procedure SetTargetFPS(fps: int) with
-        Import => True,
-        Convention => C,
-        External_Name => "SetTargetFPS";
+    procedure SetTargetFPS(fps: int);
+    pragma Import(C, SetTargetFPS, "SetTargetFPS");
 
-    function GetFontDefault return Font with
-        Import => True,
-        Convention => C,
-        External_Name => "GetFontDefault";
+    function GetFontDefault return Font;
+    pragma Import(C, GetFontDefault, "GetFontDefault");
 
-    function LoadFont(fileName: char_array) return Font with
-        Import => True,
-        Convention => C,
-        External_Name => "LoadFont";
+    function LoadFont(fileName: char_array) return Font;
+    pragma Import(C, LoadFont, "LoadFont");
 
-    function LoadFontEx(fileName: char_array; fontSize: int; codepoints: access int; codepointCount: int) return Font with
-        Import => True,
-        Convention => C,
-        External_Name => "LoadFontEx";
+    function LoadFontEx(fileName: char_array; fontSize: int; codepoints: access int; codepointCount: int) return Font;
+    pragma Import(C, LoadFontEx, "LoadFontEx");
 
-    procedure UnloadFont(fnt: Font) with
-        Import => True,
-        Convention => C,
-        External_Name => "UnloadFont";
+    procedure UnloadFont(fnt: Font);
+    pragma Import(C, UnloadFont, "UnloadFont");
 
-    function LoadRenderTexture(width, height: Integer) return RenderTexture with
-        Import => True,
-        Convention => C,
-        External_Name => "LoadRenderTexture";
+    function LoadRenderTexture(width, height: Integer) return RenderTexture;
+    pragma Import(C, LoadRenderTexture, "LoadRenderTexture");
 
-    procedure UnloadRenderTexture(texture: RenderTexture) with
-        Import => True,
-        Convention => C,
-        External_Name => "UnloadRenderTexture";
+    procedure UnloadRenderTexture(texture: RenderTexture);
+    pragma Import(C, UnloadRenderTexture, "UnloadRenderTexture");
 
-    procedure DrawTextureRec(texture: Texture2D; rec: Rectangle; pos: Vector2; tint: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawTextureRec";
+    procedure DrawTextureRec(texture: Texture2D; rec: Rectangle; pos: Vector2; tint: Color);
+    pragma Import(C, DrawTextureRec, "DrawTextureRec");
 
-    procedure DrawText(text: in char_array; posX, posY, fontSize: Integer; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawText";
+    procedure DrawText(text: in char_array; posX, posY, fontSize: Integer; col: Color);
+    pragma Import(C, DrawText, "DrawText");
 
-    procedure DrawTextEx(fnt: Font; text: char_array; pos: Vector2; fontSize, spacing: Float; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawTextEx";
+    procedure DrawTextEx(fnt: Font; text: char_array; pos: Vector2; fontSize, spacing: Float; col: Color);
+    pragma Import(C, DrawTextEx, "DrawTextEx");
 
-    function MeasureTextEx(fnt: Font; text: char_array; fontSize, spacing: Float) return Vector2 with
-        Import => True,
-        Convention => C,
-        External_Name => "MeasureTextEx";
+    function MeasureTextEx(fnt: Font; text: char_array; fontSize, spacing: Float) return Vector2;
+    pragma Import(C, MeasureTextEx, "MeasureTextEx");
 
-    procedure DrawPixelV(position: Vector2; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawPixelV";
+    procedure DrawPixelV(position: Vector2; col: Color);
+    pragma Import(C, DrawPixelV, "DrawPixelV");
 
-    procedure DrawLineEx(startPos, endPos: Vector2; thick: Float; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawLineEx";
+    procedure DrawLineEx(startPos, endPos: Vector2; thick: Float; col: Color);
+    pragma Import(C, DrawLineEx, "DrawLineEx");
 
-    procedure DrawRectangle(posX, posY, width, height: Integer; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawRectangle";
+    procedure DrawRectangle(posX, posY, width, height: Integer; col: Color);
+    pragma Import(C, DrawRectangle, "DrawRectangle");
 
-    procedure DrawRectangleRec(rec: Rectangle; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawRectangleRec";
+    procedure DrawRectangleRec(rec: Rectangle; col: Color);
+    pragma Import(C, DrawRectangleRec, "DrawRectangleRec");
 
-    procedure DrawRectangleLines(posX, posY, width, height: Integer; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawRectangleLines";
+    procedure DrawRectangleLines(posX, posY, width, height: Integer; col: Color);
+    pragma Import(C, DrawRectangleLines, "DrawRectangleLines");
 
-    procedure DrawRectangleLinesEx(rec: Rectangle; thick: Float; col: Color) with
-        Import => True,
-        Convention => C,
-        External_Name => "DrawRectangleLinesEx";
+    procedure DrawRectangleLinesEx(rec: Rectangle; thick: Float; col: Color);
+    pragma Import(C, DrawRectangleLinesEx, "DrawRectangleLinesEx");
 
-    procedure SetTextureFilter(texture: Texture2D; filter: TextureFilter) with
-        Import => True,
-        Convention => C,
-        External_Name => "SetTextureFilter";
+    procedure SetTextureFilter(texture: Texture2D; filter: TextureFilter);
+    pragma Import(C, SetTextureFilter, "SetTextureFilter");
 
-    function CheckCollisionPointRec(point: Vector2; rec: Rectangle) return C_Bool with
-        Import => True,
-        Convention => C,
-        External_Name => "CheckCollisionPointRec";
+    function CheckCollisionPointRec(point: Vector2; rec: Rectangle) return C_Bool;
+    pragma Import(C, CheckCollisionPointRec, "CheckCollisionPointRec");
 
-    function IsMouseButtonPressed(btn: MouseButton) return C_Bool with
-        Import => True,
-        Convention => C,
-        External_Name => "IsMouseButtonPressed";
+    function IsMouseButtonPressed(btn: MouseButton) return C_Bool;
+    pragma Import(C, IsMouseButtonPressed, "IsMouseButtonPressed");
 
-    function GetMousePosition return Vector2 with
-        Import => True,
-        Convention => C,
-        External_Name => "GetMousePosition";
+    function GetMousePosition return Vector2;
+    pragma Import(C, GetMousePosition, "GetMousePosition");
 
-    procedure SetMouseCursor(cursor: MouseCursor) with
-        Import => True,
-        Convention => C,
-        External_Name => "SetMouseCursor";
+    procedure SetMouseCursor(cursor: MouseCursor);
+    pragma Import(C, SetMouseCursor, "SetMouseCursor");
 
-    function IsKeyPressed(key: KeyboardKey) return C_Bool with
-        Import => True,
-        Convention => C,
-        External_Name => "IsKeyPressed";
+    function IsKeyPressed(key: KeyboardKey) return C_Bool;
+    pragma Import(C, IsKeyPressed, "IsKeyPressed");
 
     procedure DrawCenteredText(text: String; size: Float; fnt: Font; col: Color; rec: Rectangle);
     
