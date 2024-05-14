@@ -1,4 +1,6 @@
+with System; use System;
 with Interfaces.C; use Interfaces.C;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
 
 package Raylib is
 
@@ -10,6 +12,7 @@ package Raylib is
         width  : Float;
         height : Float;
     end record with Convention => C_Pass_By_Copy;
+    type RecArray is array (Integer range <>) of Rectangle;
 
     type Vector2 is record
         x: Float;
@@ -58,8 +61,8 @@ package Raylib is
         glyphCount   : int;
         glyphPadding : int;
         texture      : Texture2D;    
-        recs         : access Rectangle;
-        glyphs       : access GlyphInfo;
+        recs         : System.Address;
+        glyphs       : System.Address;
     end record with Convention => C_Pass_By_Copy;
 
     type Camera2D is record
@@ -145,6 +148,7 @@ package Raylib is
     WHITE     : constant Color := (255, 255, 255, 255);
     BLACK     : constant Color := (  0,   0,   0, 255);
 
+
     procedure InitWindow(width, height: Integer; title: in char_array);
     pragma Import(C, InitWindow, "InitWindow");
 
@@ -205,6 +209,13 @@ package Raylib is
     procedure UnloadFont(fnt: Font);
     pragma Import(C, UnloadFont, "UnloadFont");
 
+    function GetCodepoint(text: chars_ptr; codepointSize: access int) return int;
+    pragma Import(C, GetCodepoint, "GetCodepoint");
+    function GetCodepoint(text: String; codepointSize: access int) return Integer;
+
+    function GetGlyphIndex(fnt: Font; codepoint: Integer) return Integer;
+    pragma Import(C, GetGlyphIndex, "GetGlyphIndex");
+
     function LoadRenderTexture(width, height: Integer) return RenderTexture;
     pragma Import(C, LoadRenderTexture, "LoadRenderTexture");
 
@@ -220,8 +231,15 @@ package Raylib is
     procedure DrawTextEx(fnt: Font; text: char_array; pos: Vector2; fontSize, spacing: Float; col: Color);
     pragma Import(C, DrawTextEx, "DrawTextEx");
 
+    procedure DrawTextCodepoint(fnt: Font; codepoint: Integer; pos: Vector2; fnt_size: Float; tint: Color);
+    pragma Import(C, DrawTextCodepoint, "DrawTextCodepoint");
+
     function MeasureTextEx(fnt: Font; text: char_array; fontSize, spacing: Float) return Vector2;
     pragma Import(C, MeasureTextEx, "MeasureTextEx");
+
+    function TextLength(text: Interfaces.C.Strings.chars_ptr) return Interfaces.C.unsigned;
+    pragma Import(C, TextLength, "TextLength");
+    function TextLength(text: String) return Integer;
 
     procedure DrawPixelV(position: Vector2; col: Color);
     pragma Import(C, DrawPixelV, "DrawPixelV");
