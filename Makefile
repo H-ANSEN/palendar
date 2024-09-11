@@ -29,7 +29,7 @@ build-linux: raylib-5.0_linux_amd64 Retron2000.ttf
 build-windows: raylib-5.0_win64_mingw-w64 Retron2000.ttf
 	gnatmake $(FLAGS) -o palendar palendar.adb -Irgui             \
 		-largs -L./raylib-5.0_win64_mingw-w64/lib/ -l:libraylib.a \
-		-lwinmm -lgdi32
+		-lwinmm -lgdi32 -mwindows
 
 clean:
 	rm -rd raylib-*
