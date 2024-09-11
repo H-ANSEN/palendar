@@ -1,8 +1,6 @@
 # Palendar 📆
-<img align="left" src="https://github.com/H-ANSEN/palendar/blob/master/media/palendar.gif">
-Desktop date time widget reminiscent of the Nintend DS home screen!
-
-<br clear="left"><p>
+Desktop date time widget reminiscent of the Nintendo DS home screen!
+<img align="right" width="500px" src="https://github.com/H-ANSEN/palendar/blob/master/media/palendar.gif">
 
 Building from source requires `wget`, `unzip`, `gnatmake`, and can be done using the Makefile:
 ```
