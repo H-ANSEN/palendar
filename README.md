@@ -1,5 +1,5 @@
 # Palendar 📆
-<img align="right" width="500px" src="https://github.com/H-ANSEN/palendar/blob/master/media/palendar.gif">
+<img align="right" width="400px" src="https://github.com/H-ANSEN/palendar/blob/master/media/palendar.gif">
 Desktop date time widget reminiscent of the Nintendo DS home screen!
 <p>
 
