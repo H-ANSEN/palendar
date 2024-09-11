@@ -1,2 +1,6 @@
 *.o
 *.ali
+*.ttf
+*.txt
+raylib-*/
+palendar
